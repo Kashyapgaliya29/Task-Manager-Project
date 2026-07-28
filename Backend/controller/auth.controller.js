@@ -2,7 +2,18 @@ const User = require('../model/user.model')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
-exports.registerContoller = async(req,res) =>{
+exports.getMe = async(req,res,next) =>{
+    try{
+        if(!req.user){
+            return res.status(404).json({success:false,message:"User Not Found..!"})
+        }
+        return res.status(200).json({success:true,user:req.user})
+    }catch(err){
+        next(err)
+    }
+}
+
+exports.registerContoller = async(req,res,next) =>{
     try{
         const {name,email,password} = req.body;
         
@@ -22,7 +33,8 @@ exports.registerContoller = async(req,res) =>{
         next(err)
     }
 }
-exports.loginController = async(req,res) =>{
+
+exports.loginController = async(req,res,next) =>{
     try{
         const {email,password} = req.body;
         
@@ -37,12 +49,28 @@ exports.loginController = async(req,res) =>{
         }
 
         const token = await jwt.sign(
-            {_id:existUser._id,email:existUser.email},
+            {_id:existUser._id,name:existUser.name,email:existUser.email},
             process.env.S_KEY,
             {expiresIn:'1d'}
         )
 
+        res.cookie('token',token,{
+            httpOnly:true,
+            secure:false,
+            sameSite:'None',
+            maxAge:24*60*60*1000
+        })
+
         return res.status(200).json({success:true,message:"Login Successfully",token})
+    }catch(err){
+        next(err)
+    }
+}
+
+exports.logoutController = async(req,res,next) =>{
+    try{
+        res.clearCookie('token')
+        return res.status(200).json({success:true,message:'Logout Successfully..!'})
     }catch(err){
         next(err)
     }
