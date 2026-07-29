@@ -5,8 +5,10 @@ const {registerContoller,loginController,logoutController,getMe} = require('../c
 
 const protect = require('../middleware/protect.middleware')
 
-router.post('/register',registerContoller)
-router.post('/login',loginController)
+const { validateLogin,validateRegister} = require('../middleware/validation.middleware')
+
+router.post('/register',validateRegister,registerContoller)
+router.post('/login',validateLogin,loginController)
 router.post('/logout',protect,logoutController)
 router.get('/me',protect,getMe)
 
