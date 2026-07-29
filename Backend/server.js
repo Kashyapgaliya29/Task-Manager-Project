@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const connection = require('./config/db')
 const authRouter = require('./route/user.routes')
+const taskRouter = require('./route/task.routes')
 const cookieparser = require('cookie-parser')
 
 dotenv.config()
@@ -12,6 +13,7 @@ app.use(express.json())
 app.use(cookieparser())
 
 app.use('/api/auth',authRouter)
+app.use('/api/task',taskRouter)
 
 app.use((err,req,res,next)=>{
     const statusCode = err.statusCode || 500;
