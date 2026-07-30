@@ -1,42 +1,108 @@
 const Task = require('../model/task.model')
 
-exports.createTask = () =>{
+exports.createTask = async(req,res,next) =>{
     try{
+        const userId = req.user._id;
+        const {title,description,dueDate} = req.body;
 
+        const newTask = await Task.create({
+            userId,
+            title,
+            description,
+            dueDate
+        })
+
+        return res.status(201).json({success:true,message:'Task Create Successfullt..!'})
     }catch(err){
         next(err)
     }
 }
-exports.getTaskById = () =>{
+exports.getTaskById = async(req,res,next) =>{
     try{
+        const userId = req.user._id;
+        const id = req.params.id;
 
+        const task = await Task.findOne({id,userId})
+
+        if(!task){
+            return res.status(404).json({success:false,message:"Task Not Found..!"})
+        }
+
+        return res.status(200).json({success:true,data:task})
     }catch(err){
         next(err)
     }
 }
-exports.getAllTask = () =>{
+exports.getAllTask = async(req,res,next) =>{
     try{
+        const userId = req.user._id;
 
+        const tasks = await Task.findOne({userId}).sort({createdAt:-1})
+
+        if(!tasks){
+            return res.status(404).json({success:false,message:"Task Not Found..!"})
+        }
+
+        return res.status(200).json({success:true,data:tasks})
     }catch(err){
         next(err)
     }
 }
-exports.updateTask = () =>{
+exports.updateTask = async(req,res,next) =>{
     try{
+        const userId = req.user._id;
+        const id = req.params.id;
+        const {title,description,dueDate} = req.body;
 
+        const task = await Task.findOne({id,userId})
+
+        if(!task){
+            return res.status(404).json({success:false,message:"Task Not Found..!"})
+        }
+
+        task.title = title;
+        task.description = description;
+        task.dueDate = dueDate;
+
+        await task.save()
+
+        return res.status(200).json({success:true,message:'Task Updated Successfullt..!',data:task})
     }catch(err){
         next(err)
     }
 }
-exports.deleteTask = () =>{
+exports.deleteTask = async(req,res,next) =>{
     try{
+        const userId = req.user._id;
+        const id = req.params.id;
 
+        const task = await Task.findOne({id,userId})
+        if(!task){
+            return res.status(404).json({success:false,message:"Task Not Found..!"})
+        }
+        
+        task.isDeleted = true;
+        await task.save()
+
+        return res.status(200).json({success:true,message:'Task Deleted.'})
     }catch(err){
         next(err)
     }
 }
-exports.toggleTaskStatus = () =>{
+exports.toggleTaskStatus = async(req,res,next) =>{
     try{
+        const userId = req.user._id;
+        const id = req.params.id;
+
+        const task = await Task.findOne({id,userId})
+        if(!task){
+            return res.status(404).json({success:false,message:"Task Not Found..!"})
+        }
+        
+        task.completed = !task.completed;
+        await task.save()
+
+        return res.status(200).json({success:true,message:'Task Toggle Status Updated..!',data:task})
 
     }catch(err){
         next(err)
