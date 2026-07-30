@@ -11,12 +11,15 @@ const {
 } = require('../controller/task.controller')
 
 const protect = require('../middleware/protect.middleware')
+const { validateTask } = require('../middleware/validation.middleware')
 
-router.post('/',protect,createTask)
-router.get('/',protect,getAllTask)
-router.get('/:id',protect,getTaskById)
-router.patch('/:id',protect,updateTask)
-router.delete('/:id',protect,deleteTask)
-router.patch('/:id/toggle',protect,toggleTaskStatus)
+// router.use(protect)
+router.post('/',validateTask,createTask)
+router.get('/',getAllTask)
+router.get('/stats',taskStates)
+router.get('/:id',getTaskById)
+router.patch('/:id',validateTask,updateTask)
+router.delete('/:id',deleteTask)
+router.patch('/:id/toggle',toggleTaskStatus)
 
 module.exports = router;

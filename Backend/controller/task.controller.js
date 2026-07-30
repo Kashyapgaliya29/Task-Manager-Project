@@ -37,7 +37,7 @@ exports.getAllTask = async(req,res,next) =>{
     try{
         const userId = req.user._id;
 
-        const tasks = await Task.find({userId,isDeleted:false}).sort({createdAt:-1})
+        const tasks = await Task.find({userId,isDeleted:false}).sort({createdAt:-1}).lean()
 
         if(!tasks){
             return res.status(404).json({success:false,message:"Task Not Found..!"})
@@ -103,6 +103,33 @@ exports.toggleTaskStatus = async(req,res,next) =>{
         await task.save()
 
         return res.status(200).json({success:true,message:'Task Toggle Status Updated..!',data:task})
+
+    }catch(err){
+        next(err)
+    }
+}
+
+exports.taskStates = async(req,res,next) =>{
+    try{
+        const userId = req.user._id;
+
+        const total = await Task.countDocuments({userId})
+
+        const completedTask = await Task.countDocuments({userId,completed:true,isDeleted:false})
+
+        const pendingTask = await Task.countDocuments({userId,completed:false,isDeleted:false})
+
+        const overDueTask = await Task.countDocuments({userId,isDeleted:false,completed:false,dueDate:{$lt:new Date()}})
+
+        return res.status(200).json({
+            success:true,
+            stats:{
+                total:total,
+                completedTask:completedTask,
+                pendingTask:pendingTask,
+                overDueTask:overDueTask
+            }
+        })
 
     }catch(err){
         next(err)

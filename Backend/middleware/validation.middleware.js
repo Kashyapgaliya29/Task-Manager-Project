@@ -45,7 +45,25 @@ const validateLogin = (req,res,next) =>{
     next()
 }
 
+const validateTask = (req,res,next) =>{
+    const {title,description,dueDate} = req.body;
+
+    if(!title || title.trim() === ''){
+        return res.status(400).json({success:false,message:"Please Enter Valid Title"})
+    }
+
+    if(!description || description.length>300 || description.trim() === ''){
+        return res.status(400).json({success:false,message:"Please Enter Valid Description"})
+    }
+
+    if(!dueDate){
+        return res.status(400).json({success:false,message:"Enter Valid Date"})
+    }
+    next()
+}
+
 module.exports = {
     validateRegister,
-    validateLogin
+    validateLogin,
+    validateTask
 }
