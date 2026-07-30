@@ -12,7 +12,7 @@ exports.createTask = async(req,res,next) =>{
             dueDate
         })
 
-        return res.status(201).json({success:true,message:'Task Create Successfullt..!'})
+        return res.status(201).json({success:true,message:'Task Create Successfullt..!',data:newTask})
     }catch(err){
         next(err)
     }
@@ -22,7 +22,7 @@ exports.getTaskById = async(req,res,next) =>{
         const userId = req.user._id;
         const id = req.params.id;
 
-        const task = await Task.findOne({id,userId})
+        const task = await Task.findOne({_id:id,userId,isDeleted:false})
 
         if(!task){
             return res.status(404).json({success:false,message:"Task Not Found..!"})
@@ -37,7 +37,7 @@ exports.getAllTask = async(req,res,next) =>{
     try{
         const userId = req.user._id;
 
-        const tasks = await Task.findOne({userId}).sort({createdAt:-1})
+        const tasks = await Task.find({userId,isDeleted:false}).sort({createdAt:-1})
 
         if(!tasks){
             return res.status(404).json({success:false,message:"Task Not Found..!"})
@@ -54,7 +54,7 @@ exports.updateTask = async(req,res,next) =>{
         const id = req.params.id;
         const {title,description,dueDate} = req.body;
 
-        const task = await Task.findOne({id,userId})
+        const task = await Task.findOne({_id:id,userId,isDeleted:false})
 
         if(!task){
             return res.status(404).json({success:false,message:"Task Not Found..!"})
@@ -76,7 +76,7 @@ exports.deleteTask = async(req,res,next) =>{
         const userId = req.user._id;
         const id = req.params.id;
 
-        const task = await Task.findOne({id,userId})
+        const task = await Task.findOne({_id:id,userId,isDeleted:false})
         if(!task){
             return res.status(404).json({success:false,message:"Task Not Found..!"})
         }
@@ -94,7 +94,7 @@ exports.toggleTaskStatus = async(req,res,next) =>{
         const userId = req.user._id;
         const id = req.params.id;
 
-        const task = await Task.findOne({id,userId})
+        const task = await Task.findOne({_id:id,userId,isDeleted:false})
         if(!task){
             return res.status(404).json({success:false,message:"Task Not Found..!"})
         }
