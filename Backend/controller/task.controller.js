@@ -113,7 +113,7 @@ exports.taskStates = async(req,res,next) =>{
     try{
         const userId = req.user._id;
 
-        const total = await Task.countDocuments({userId})
+        const total = await Task.countDocuments({userId,isDeleted:false})
 
         const completedTask = await Task.countDocuments({userId,completed:true,isDeleted:false})
 

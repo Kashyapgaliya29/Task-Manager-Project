@@ -7,13 +7,14 @@ const {
     getTaskById,
     updateTask,
     deleteTask,
-    toggleTaskStatus
+    toggleTaskStatus,
+    taskStates
 } = require('../controller/task.controller')
 
 const protect = require('../middleware/protect.middleware')
 const { validateTask } = require('../middleware/validation.middleware')
 
-// router.use(protect)
+router.use(protect)     
 router.post('/',validateTask,createTask)
 router.get('/',getAllTask)
 router.get('/stats',taskStates)
